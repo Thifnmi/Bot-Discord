@@ -9,4 +9,4 @@ COPY . .
 
 RUN apt-get update && apt-get install -y ffmpeg && pip uninstall youtube_dl -y && pip install git+https://github.com/ytdl-org/youtube-dl.git@master#egg=youtube_dl
 
-CMD [ "python3", "main.py"]
+CMD [ "python3", "server.py"]
