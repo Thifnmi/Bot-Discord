@@ -25,14 +25,14 @@ Covid 19 commands:
 """
         self.text_channel_list = []
  
-    # @commands.Cog.listener()
-    # async def on_ready(self):
-    #     # print((f'{self.bot.user.name} has connected to Discord!'))
-    #     for guild in self.bot.guilds:
-    #         for channel in guild.text_channels:
-    #             self.text_channel_list.append(channel)
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print((f'{self.bot.user.name} has connected to Discord!'))
+        # for guild in self.bot.guilds:
+        #     for channel in guild.text_channels:
+        #         self.text_channel_list.append(channel)
 
-    #     await self.send_to_config_channel("test", self.help_message)
+        # await self.send_to_config_channel("test", self.help_message)
 
     @commands.command(name="help", aliases=["h"], help="Displays all the available commands")
     async def help(self, ctx):
