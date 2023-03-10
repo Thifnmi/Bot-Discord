@@ -9,7 +9,7 @@ class Music(commands.Cog):
         self.is_paused = False
         self.current = None
         self.music_queue = []
-        self.YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'True'}
+        self.YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist':'False'}
         self.FFMPEG_OPTIONS = {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 
         self.vc = None
@@ -28,6 +28,7 @@ class Music(commands.Cog):
             self.is_playing = True
             m_url = self.music_queue[0][0]['source']
             self.music_queue.pop(0)
+            self.current = self.music_queue[0][0]["title"]
             self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
         else:
             self.is_playing = False
@@ -81,7 +82,7 @@ class Music(commands.Cog):
             if type(song) == type(True):
                 await ctx.send("Could not download the song. Incorrect format try another keyword. This could be due to playlist or a livestream format.")
             else:
-                await ctx.send("Song added to the queue")
+                await ctx.send(f"Song {song[0]['title']} added to the queue")
                 self.music_queue.append([song, voice_channel])
                 
                 if self.is_playing == False:
@@ -139,4 +140,17 @@ class Music(commands.Cog):
         if self.vc != None and self.is_playing:
             self.vc.stop()
         self.music_queue = []
+        self.current = None
         await ctx.send("Music queue cleared")
+
+    @commands.command(name="remove", aliases=["rm"], help="Remove song in queue")
+    async def remove(self, ctx, *args):
+        if args:
+            if len(args) > 1:
+                await ctx.send("Remove only receive one agrument. Example: `!remove 1` to remove this first song in queue")
+            index = args[0]
+            if index < 1:
+                await ctx.send("Index must lager 1")
+            if index > len(self.music_queue):
+                await ctx.send("Index out of range queue")
+            self.music_queue.pop(index - 1)

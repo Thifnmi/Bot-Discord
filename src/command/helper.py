@@ -7,15 +7,20 @@ class Helper(commands.Cog):
 ```
 Bot music by @Thifnmi is running 👀👀
 
-General commands:
-!help - displays all the available commands
-!play <keywords> - finds the song on youtube and plays it in your current channel. Will resume playing the current song if it was paused
-!queue - displays the current music queue
+Mucsic commands:
+!help or !h - displays all the available commands
+!play <keywords> or !p <keywords> - finds the song on youtube and plays it in your current channel. Will resume playing the current song if it was paused
+!queue or !q - displays the current music queue
 !skip - skips the current song being played
+!skip <index> - next to the song number in queue and play
 !clear - Stops the music and clears the queue
 !quit - Disconnected the bot from the voice channel
 !pause - pauses the current song being played or resumes if already paused
 !resume - resumes playing the current song
+!remove <index> - remove song in queue with index
+
+Covid 19 commands:
+!covid19 - display infe about covid19 in VN
 ```
 """
         self.text_channel_list = []
