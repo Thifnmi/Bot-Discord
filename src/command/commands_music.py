@@ -1,5 +1,6 @@
 import math
 import discord
+import validators
 from discord.ext import commands
 from youtube_dl import YoutubeDL
 
@@ -18,8 +19,11 @@ class Music(commands.Cog):
     def search_yt(self, item):
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
             try:
-                info = ydl.extract_info("ytsearch:%s" % item, download=False)['entries'][0]
-            except Exception: 
+                if validators.url(item):
+                    info = ydl.extract_info(item, download=False)
+                else:
+                    info = ydl.extract_info("ytsearch:%s" % item, download=False)['entries'][0]
+            except Exception as e:
                 return False
         return info
 
