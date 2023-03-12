@@ -88,11 +88,19 @@ class Music(commands.Cog):
             if type(song) == type(True):
                 await ctx.reply("Could not download the song. Incorrect format try another keyword. This could be due to playlist or a livestream format.")
             else:
-                self.music_queue.append([song, voice_channel])
-                await ctx.reply(f"Song `{song['title']}` added")
-                
-                if self.is_playing == False:
-                    await self.play_music(ctx)
+                if song["_type"]:
+                    for item in song['entries']:
+                        self.music_queue.append([item, voice_channel])
+                    await ctx.reply(f"Add {len(song['entries'])} song in playlist {query} to queue")
+
+                    if self.is_playing == False:
+                        await self.play_music(ctx)
+                else:
+                    self.music_queue.append([song, voice_channel])
+                    await ctx.reply(f"Song `{song['title']}` added")
+                    
+                    if self.is_playing == False:
+                        await self.play_music(ctx)
 
     @commands.command(name="pause", help="Pauses the current song being played")
     async def pause(self, ctx, *args):
