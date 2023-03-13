@@ -22,7 +22,7 @@ class Music(commands.Cog):
                 if validators.url(item):
                     info = ydl.extract_info(item, download=False)
                 else:
-                    info = ydl.extract_info("ytsearch:%s" % item, download=False)['entries'][0]
+                    info = ydl.extract_info("ytsearch:%s" % item, download=False)
             except Exception as e:
                 return False
         return info
@@ -88,14 +88,21 @@ class Music(commands.Cog):
             if type(song) == type(True):
                 await ctx.reply("Could not download the song. Incorrect format try another keyword. This could be due to playlist or a livestream format.")
             else:
-                if song["_type"]:
-                    for item in song['entries']:
-                        self.music_queue.append([item, voice_channel])
-                    await ctx.reply(f"Add {len(song['entries'])} song in playlist {query} to queue")
+                try:
+                    if song['entries'] and len(song['entries']) > 1:
+                        for item in song['entries']:
+                            self.music_queue.append([item, voice_channel])
 
-                    if self.is_playing == False:
-                        await self.play_music(ctx)
-                else:
+                            if self.is_playing == False:
+                                await self.play_music(ctx)
+                        await ctx.reply(f"Add {len(song['entries'])} song in playlist {query} to queue")
+                    else:
+                        self.music_queue.append([song['entries'][0], voice_channel])
+                        await ctx.reply(f"Song `{song['entries'][0]['title']}` added")
+                        
+                        if self.is_playing == False:
+                            await self.play_music(ctx)
+                except Exception as e:
                     self.music_queue.append([song, voice_channel])
                     await ctx.reply(f"Song `{song['title']}` added")
                     
