@@ -4,7 +4,7 @@ from discord.ext import commands
 from src.command import Music, Covid19, Helper
 
 env = os.getenv("ENV", "production")
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix=config[env].COMMAND_PREFIX)
 
 
 #remove the default help command so that we can write out own

@@ -32,7 +32,7 @@ class Music(commands.Cog):
             self.is_playing = True
             item = self.music_queue[0][0]
             m_url = item['formats'][0]['url']
-            self.current = item["title"]
+            self.current = item
             self.music_queue.pop(0)
             self.vc.play(discord.FFmpegPCMAudio(m_url, **self.FFMPEG_OPTIONS), after=lambda e: self.play_next())
         else:
@@ -80,7 +80,7 @@ class Music(commands.Cog):
         
         voice_channel = ctx.author.voice.channel
         if voice_channel is None:
-            await ctx.send("Connect to a voice channel!")
+            await ctx.reply("Connect to a voice channel!")
         elif self.is_paused:
             self.vc.resume()
         else:
@@ -143,46 +143,44 @@ class Music(commands.Cog):
                 await self.play_music(ctx, (to - 1))
             else:
                 await ctx.reply(
-                    f"Skip only receive one agrument and must is number but\
-                         received character `{args}`.Example: `!skip 1`\
-                              will skip to the first song in queue")
+                    f"Skip only receive one agrument and must is number but received character `{args}`.Example: `!skip 1` will skip to the first song in queue")
 
-        if self.vc != None and self.vc:
+        elif self.vc != None and self.vc:
             self.vc.stop()
+            embed = discord.Embed(description=(f"Skiped [`{self.current['title']}`]({self.current['webpage_url']})"))
+            await ctx.reply(embed=embed)
             await self.play_music(ctx)
 
 
     @commands.command(name="queue", aliases=["q"], help="Displays the current songs in queue")
-    @commands.has_permissions(manage_guild=True)
     async def queue(self, ctx, page: int = 1, pages: int = 1):
         embed = False
         queue = ''
         if self.is_playing:
-            embed = discord.Embed(description=(f"`Playing:` {self.current['title']}\
+            embed = discord.Embed(description=(f"`Playing`: [`{self.current['title']}`]({self.current['webpage_url']}) {parse_duration(self.current['duration'])}\
                 \n -----------------------------------------------------------------\
                 \n")
             )
-        if len(self.music_queue) == 0:
-            queue = 'No song in queue'
+            if len(self.music_queue) == 0:
+                queue = 'No song in queue'
+            else:
+                items_per_page = 5
+                pages = math.ceil(len(self.music_queue) / items_per_page)
+                for i in range(0, len(self.music_queue)):
+                    if (i > (items_per_page - 1)):
+                        break
+                    queue += '`{}`. [`{}`]({}) {}\n'\
+                            .format(
+                                i+1,
+                                self.music_queue[i][0]["title"],
+                                self.music_queue[i][0]['webpage_url'],
+                                parse_duration(self.music_queue[i][0]["duration"])
+                            )
+                embed.set_footer(text='Page {}/{}'.format(page, pages))
+            embed.add_field(name="", value=queue)
+            await ctx.reply(embed=embed)
         else:
-            items_per_page = 5
-            pages = math.ceil(len(self.music_queue) / items_per_page)
-
-            start = (page - 1) * items_per_page
-            end = start + items_per_page
-            for i in range(0, len(self.music_queue)):
-                if (i > (items_per_page - 1)):
-                    break
-                queue += '`{}`. [`{}`]({}) {}\n'\
-                        .format(
-                            i+1,
-                            self.music_queue[i][0]["title"],
-                            self.music_queue[i][0]['webpage_url'],
-                            parse_duration(self.music_queue[i][0]["duration"])
-                        )
-            embed.set_footer(text='Page {}/{}'.format(page, pages))
-        embed.add_field(name="", value=queue)
-        await ctx.reply(embed=embed)
+            await ctx.reply("No song in queue")
 
     @commands.command(name="clear", help="Stops the music and clears the queue")
     async def clear(self, ctx):

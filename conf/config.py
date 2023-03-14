@@ -25,6 +25,7 @@ class BaseConfig(object):
 
     TOKEN = _get_config_value("TOKEN", "MyKey")
     COVID19 = _get_config_value("COVID19", "https://thifnmi.com")
+    COMMAND_PREFIX = _get_config_value("COMMAND_PREFIX", "!")
 
 
 class DevelopmentConfig(BaseConfig):
